@@ -1,0 +1,43 @@
+version: '2.3'
+
+services:
+    httpbingo:
+        image: mccutchen/go-httpbin
+        restart: unless-stopped
+        expose:
+            - 8080
+        labels:
+            com.centurylinklabs.watchtower.enable: true
+
+    frontend:
+        image: staticfloat/nginx-certbot
+        restart: unless-stopped
+        environment:
+            CERTBOT_EMAIL: staticfloat@gmail.com
+            # Allow us to template the $STORAGE_SERVER_FQDN value within the nginx config
+            FQDN: httpbingo.julialang.org
+            ENVSUBST_VARS: FQDN
+        ports:
+            - 80:80/tcp
+            - 443:443/tcp
+        depends_on:
+            - httpbingo
+        volumes:
+            # Mount in our nginx config
+            - ./httpbingo.julialang.org.conf:/etc/nginx/user.conf.d/httpbingo.julialang.org.conf
+            # Keep SSL certificates permanently
+            - letsencrypt:/etc/letsencrypt
+        labels:
+            com.centurylinklabs.watchtower.enable: true
+
+    # Auto-reload docker containers when their images are updated
+    watchtower:
+        image: containrrr/watchtower
+        restart: unless-stopped
+        volumes:
+            # Mount the docker socket
+            - /var/run/docker.sock:/var/run/docker.sock
+        command: --cleanup --label-enable
+
+volumes:
+  letsencrypt:
