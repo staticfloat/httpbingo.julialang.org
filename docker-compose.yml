@@ -23,7 +23,8 @@ services:
         depends_on:
             - httpbingo
         volumes:
-            # Mount in our nginx config
+            # Mount in our nginx configs
+            - ./nginx.optimized.conf:/etc/nginx/nginx.conf:ro
             - ./httpbingo.julialang.org.conf:/etc/nginx/user.conf.d/httpbingo.julialang.org.conf
             # Keep SSL certificates permanently
             - letsencrypt:/etc/letsencrypt
