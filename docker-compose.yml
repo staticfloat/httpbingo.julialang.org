@@ -8,6 +8,7 @@ services:
             - 8080
         labels:
             com.centurylinklabs.watchtower.enable: true
+            com.centurylinklabs.watchtower.scope: httpbingo
 
     frontend:
         image: staticfloat/nginx-certbot
@@ -30,6 +31,8 @@ services:
             - letsencrypt:/etc/letsencrypt
         labels:
             com.centurylinklabs.watchtower.enable: true
+            com.centurylinklabs.watchtower.scope: httpbingo
+
 
     # Auto-reload docker containers when their images are updated
     watchtower:
@@ -39,6 +42,9 @@ services:
             # Mount the docker socket
             - /var/run/docker.sock:/var/run/docker.sock
         command: --cleanup --label-enable
+        labels:
+            com.centurylinklabs.watchtower.enable: true
+            com.centurylinklabs.watchtower.scope: httpbingo
 
 volumes:
   letsencrypt:
